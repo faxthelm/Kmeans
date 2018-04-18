@@ -28,12 +28,15 @@ public class Main {
 					Integer.parseInt(args[4]), Integer.parseInt(args[5]));
 			
 			prototiposAnteriorInt = kMeans.inicializarPrototipos();
+			prototiposAnteriorInt = copiarPrototiposInt(prototiposAnteriorInt, Integer.parseInt(args[1]),
+					Integer.parseInt(args[5]));
 			
 			while(!bomResultado){
 				iteracoes++;
 				kMeans.definirDistanciasEuclidianas();
 				kMeans.clustering();
 				jcmAtual = kMeans.calcularJCM();
+				System.out.println("JCM: " + jcmAtual);
 				kMeans.redefinirPrototipos();
 				
 				condicaoParada = kMeans.diferencaPrototipos(prototiposAnteriorInt);
@@ -43,6 +46,8 @@ public class Main {
 					resp = kMeans.getMatrizParticao();
 				}
 				prototiposAnteriorInt = kMeans.getPrototipos();
+				prototiposAnteriorInt = copiarPrototiposInt(prototiposAnteriorInt, Integer.parseInt(args[1]),
+						Integer.parseInt(args[5]));
 			}
 		}else{
 			
@@ -60,5 +65,15 @@ public class Main {
 			e.printStackTrace();
 		}
 		
+	}
+	
+	public static int[][] copiarPrototiposInt(int[][] prototipos, int linhas, int colunas) {
+		int[][] prototiposAnterior = new int[linhas][colunas];
+		for (int i = 0; i < linhas; i++) {
+			for (int j = 0; j < colunas; j++) {
+				prototiposAnterior[i][j] = prototipos[i][j];
+			}
+		}
+		return prototiposAnterior;
 	}
 }

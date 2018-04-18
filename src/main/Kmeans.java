@@ -49,7 +49,7 @@ public class Kmeans {
 	private int numeroDimensoes;
 
 	/**
-	 * valor mávalorDadomo dos números que podem ser escolhidos aleatoriamente para a
+	 * valores máximos dos números que podem ser escolhidos aleatoriamente para a
 	 * criação dos prototipos
 	 */
 	private int[] max;
@@ -59,7 +59,7 @@ public class Kmeans {
 		try {
 			BufferedReader leitor = new BufferedReader(new FileReader(arquivo));
 
-			/*
+			/**
 			 * Para popular a matriz dados é necessário saber o número de linhas
 			 * e o número de dimensões do corpus recebido
 			 */
@@ -69,34 +69,41 @@ public class Kmeans {
 			this.k = k;
 
 
-			// inicialização das matrizes
+			/**
+			 * Inicialização das matrizes
+			 */
 			dados = new int[numeroLinhas][numeroDimensoes];
 			prototipos = new int[k][numeroDimensoes];
 			distanciasEuclidianas = new double[numeroLinhas][k];
 			matrizParticao = new int[k][numeroLinhas];
 
-			// Leitura do arquivo e população da matriz de dados
-			// O valor mávalorDadomo já será descoberto simultaneamente a população
+			/**
+			 *  Leitura do arquivo e população da matriz de dados
+			 */
 			max = new int[numeroDimensoes];
 			String linha = null;
 			String[] numColunas = null;
 			int i = 0;
 			int j = 0;
-			int co = 1;
-			//Le a linha que contem o nome das palavras
+			/**
+			 * Le a linha que contem o nome das palavras
+			 */
 			leitor.readLine();
+			
 			
 			while ((linha = leitor.readLine()) != null) {
 				numColunas = linha.split(",");
-				for(;co <= colunas; co++) {
+				for(int co = 1; co <= colunas; co++) {
 					dados[i][j] = Integer.parseInt(numColunas[co]);
+					/**
+					 * Os valores máximos já serão descobertos simultaneamente a população
+					 */
 					if (dados[i][j] > max[j]) {
 						max[j] = dados[i][j];
 					}
 					j++;
 				}
 				j = 0;
-				co = 1;
 				i++;
 			}
 			
@@ -106,8 +113,12 @@ public class Kmeans {
 
 		}
 	}
-
-
+	
+	/**
+	 * inicializa aleatoriamente os prototipos na primeira iteração
+	 * considerando o valor máximo de cada dimensão
+	 * @return
+	 */
 	public int[][] inicializarPrototipos() {
 		int randomNumber = 0;
 		Random rand = new Random();
@@ -127,12 +138,17 @@ public class Kmeans {
 		double diferencaQuadrado = 0;
 		double valorDado = 0;
 		double valorPrototipo = 0;
-		// percorrendo prototipos
+		/**
+		 *  percorrendo prototipos
+		 */
 		for (int prototipo = 0; prototipo < k; prototipo++) {
-			// percorrendo documentos
-			// todos para cada prototipo
+			/**
+			 *  percorrendo todos documentos para cada prototipo
+			 */
 			for (int documento = 0; documento < numeroLinhas; documento++) {
-				// calculo da distancia para um documento
+				/**
+				 *  cálculo da distância para um documento
+				 */
 				for(int palavra = 0; palavra < numeroDimensoes; palavra++){
 					valorDado = dados[documento][palavra];
 					valorPrototipo = prototipos[prototipo][palavra];
@@ -151,7 +167,7 @@ public class Kmeans {
 		double atual = 0;
 		int cluster = 0;
 		for (int documento = 0; documento < numeroLinhas; documento++) {
-			/*
+			/**
 			 *  Calcula qual o prototipo com menor distancia e assim define um
 			 *  cluster para o dado
 			 */
@@ -166,12 +182,18 @@ public class Kmeans {
 					cluster = prototipo;
 				}
 			}
-			// adiciona o valor um a matriz de particao no local marcando o
-			// cluster a qual pertence
+			/**
+			 *  adiciona o valor um a matriz de particao no local marcando o
+			 *  cluster a qual pertence
+			 */
 			matrizParticao[cluster][documento] = 1;
 		}
 
 	}
+	
+	/** 
+	 * zera matriz de partição
+	 */
 	private void inicializarMatrizParticao() {
 
 		for (int i = 0; i < k; i++) {
@@ -180,7 +202,6 @@ public class Kmeans {
 			}
 		}
 	}
-
 
 	public double calcularJCM() {
 		double jcmAtual = 0;
@@ -210,9 +231,11 @@ public class Kmeans {
 				}
 				
 			}
+			/**
+			 *  evitar erro aritimético de divisão por 0				
+			 */
 			if(integrantes>0){
 				for (int palavra = 0; palavra < numeroDimensoes; palavra++) {
-					// evitar erro aritimético de divisão por 0				
 					prototipos[prototipo][palavra] = (prototipos[prototipo][palavra]/integrantes);
 				}
 			}
@@ -221,12 +244,22 @@ public class Kmeans {
 		return prototipos;
 	}
 
+	/** 
+	 * zera matriz de prototipos
+	 * @param prototipo
+	 */
 	private void inicializarPrototipo(int prototipo) {
 		for (int j = 0; j < numeroDimensoes; j++) {
 			prototipos[prototipo][j] = 0;
 		}
 	}
 	
+	/** 
+	 * distância euclidiana entre os prototipos da iteração anterior com
+	 * os da iteração atual para saber a movimentação que ocorreu
+	 * @param prototiposAnterior
+	 * @return
+	 */
 	public double diferencaPrototipos(int [][] prototiposAnterior) {
 		double resposta = 0;
 		double soma = 0;
