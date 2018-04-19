@@ -1,7 +1,9 @@
 package main;
 
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.IOException;
 import java.util.Random;
 
 public class Kmeans {
@@ -20,22 +22,21 @@ public class Kmeans {
 	/**
 	 * matriz com os protótipos int[k][numeroDimensoes];
 	 */
-
 	private int[][] prototipos;
 
 	/**
 	 * matriz com a distância euclidiana entre os documentos e os protótipos
 	 */
-
 	private double[][] distanciasEuclidianas;
-
 
 	/**
 	 * matriz binaria de partição int[k][numeroLinhas]
 	 */
 	private int[][] matrizParticao;
 	
-	
+	/**
+	 * quantização do erro de agrupamento
+	 */
 	private double jcm;
 
 	/**
@@ -59,7 +60,7 @@ public class Kmeans {
 		try {
 			BufferedReader leitor = new BufferedReader(new FileReader(arquivo));
 
-			/**
+			/*
 			 * Para popular a matriz dados é necessário saber o número de linhas
 			 * e o número de dimensões do corpus recebido
 			 */
@@ -69,7 +70,7 @@ public class Kmeans {
 			this.k = k;
 
 
-			/**
+			/*
 			 * Inicialização das matrizes
 			 */
 			dados = new int[numeroLinhas][numeroDimensoes];
@@ -77,7 +78,7 @@ public class Kmeans {
 			distanciasEuclidianas = new double[numeroLinhas][k];
 			matrizParticao = new int[k][numeroLinhas];
 
-			/**
+			/*
 			 *  Leitura do arquivo e população da matriz de dados
 			 */
 			max = new int[numeroDimensoes];
@@ -85,8 +86,8 @@ public class Kmeans {
 			String[] numColunas = null;
 			int i = 0;
 			int j = 0;
-			/**
-			 * Le a linha que contem o nome das palavras
+			/*
+			 * Lê a linha que contém o nome das palavras
 			 */
 			leitor.readLine();
 			
@@ -95,7 +96,7 @@ public class Kmeans {
 				numColunas = linha.split(",");
 				for(int co = 1; co <= colunas; co++) {
 					dados[i][j] = Integer.parseInt(numColunas[co]);
-					/**
+					/*
 					 * Os valores máximos já serão descobertos simultaneamente a população
 					 */
 					if (dados[i][j] > max[j]) {
@@ -109,8 +110,12 @@ public class Kmeans {
 			
 			leitor.close();
 			
-		} catch (Exception e) {
-
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 	
@@ -124,7 +129,7 @@ public class Kmeans {
 		Random rand = new Random();
 		for(int prototipo = 0; prototipo < k; prototipo++){
 			for(int palavra = 0; palavra < numeroDimensoes; palavra++){
-				randomNumber = rand.nextInt(max[palavra]);
+				randomNumber = rand.nextInt(max[palavra] + 1);
 				System.out.println(randomNumber + "  " + max[palavra]);
 				prototipos[prototipo][palavra] = randomNumber;
 			}
@@ -138,15 +143,15 @@ public class Kmeans {
 		double diferencaQuadrado = 0;
 		double valorDado = 0;
 		double valorPrototipo = 0;
-		/**
+		/*
 		 *  percorrendo prototipos
 		 */
 		for (int prototipo = 0; prototipo < k; prototipo++) {
-			/**
+			/*
 			 *  percorrendo todos documentos para cada prototipo
 			 */
 			for (int documento = 0; documento < numeroLinhas; documento++) {
-				/**
+				/*
 				 *  cálculo da distância para um documento
 				 */
 				for(int palavra = 0; palavra < numeroDimensoes; palavra++){
@@ -167,7 +172,7 @@ public class Kmeans {
 		double atual = 0;
 		int cluster = 0;
 		for (int documento = 0; documento < numeroLinhas; documento++) {
-			/**
+			/*
 			 *  Calcula qual o prototipo com menor distancia e assim define um
 			 *  cluster para o dado
 			 */
@@ -182,7 +187,7 @@ public class Kmeans {
 					cluster = prototipo;
 				}
 			}
-			/**
+			/*
 			 *  adiciona o valor um a matriz de particao no local marcando o
 			 *  cluster a qual pertence
 			 */
@@ -191,7 +196,7 @@ public class Kmeans {
 
 	}
 	
-	/** 
+	/**
 	 * zera matriz de partição
 	 */
 	private void inicializarMatrizParticao() {
@@ -231,7 +236,7 @@ public class Kmeans {
 				}
 				
 			}
-			/**
+			/*
 			 *  evitar erro aritimético de divisão por 0				
 			 */
 			if(integrantes>0){

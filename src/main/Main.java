@@ -5,13 +5,16 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 public class Main {
-	// Parâmetros
-	// args[0] = nome do arquivo
-	// args[1] = k grupos
-	// args[2] = taxa de erro
-	// args[3] = tipo: binario, tf ou tfidf
-	// args[4] = linhas
-	// args[5] = colunas
+	/**
+	 *  Parâmetros
+	 * args[0] = nome do arquivo
+	 * args[1] = k grupos
+	 * args[2] = taxa de erro
+	 * args[3] = tipo: binario, tf ou tfidf
+	 * args[4] = linhas
+	 * args[5] = colunas
+	 * @param args
+	 */
 	public static void main(String [] args){
 		boolean bomResultado = false; // controla o fato de algoritmo já ter alcançado um bom resultado ou não
 		int iteracoes = 0;
@@ -49,9 +52,45 @@ public class Main {
 				prototiposAnteriorInt = copiarPrototiposInt(prototiposAnteriorInt, Integer.parseInt(args[1]),
 						Integer.parseInt(args[5]));
 			}
-		}else{
+			
+	
+		} else{
+			/*
+			 *  Se a representação do pré-processamento for tfifd 
+			 *  representaremos seus campos como double e não mais
+			 *  int
+			 */
+			KmeansDouble kMeans = new KmeansDouble(args[0], Integer.parseInt(args[1]),
+					Integer.parseInt(args[4]), Integer.parseInt(args[5]));
+			
+			prototiposAnteriorDouble = kMeans.inicializarPrototipos();
+			prototiposAnteriorDouble = copiarPrototiposDouble(prototiposAnteriorDouble, Integer.parseInt(args[1]),
+					Integer.parseInt(args[5]));
+			
+			while(!bomResultado){
+				iteracoes++;
+				kMeans.definirDistanciasEuclidianas();
+				kMeans.clustering();
+				jcmAtual = kMeans.calcularJCM();
+				System.out.println("JCM: " + jcmAtual);
+				kMeans.redefinirPrototipos();
+				
+				condicaoParada = kMeans.diferencaPrototipos(prototiposAnteriorDouble);
+				if (condicaoParada < Double.parseDouble(args[2])) {
+					bomResultado = true;
+					//Teste
+					resp = kMeans.getMatrizParticao();
+				}
+				prototiposAnteriorDouble = kMeans.getPrototipos();
+				prototiposAnteriorDouble = copiarPrototiposDouble(prototiposAnteriorDouble, Integer.parseInt(args[1]),
+						Integer.parseInt(args[5]));
+				
+			}
+			
 			
 		}
+		
+		// TESTE printar grupos formados - matriz de particao
 		try {
 			BufferedWriter br = new BufferedWriter(new FileWriter("resp.csv"));
 			for (int i = 0; i < Integer.parseInt(args[1]); i++) {
@@ -69,6 +108,16 @@ public class Main {
 	
 	public static int[][] copiarPrototiposInt(int[][] prototipos, int linhas, int colunas) {
 		int[][] prototiposAnterior = new int[linhas][colunas];
+		for (int i = 0; i < linhas; i++) {
+			for (int j = 0; j < colunas; j++) {
+				prototiposAnterior[i][j] = prototipos[i][j];
+			}
+		}
+		return prototiposAnterior;
+	}
+	
+	public static double[][] copiarPrototiposDouble(double[][] prototipos, int linhas, int colunas) {
+		double[][] prototiposAnterior = new double[linhas][colunas];
 		for (int i = 0; i < linhas; i++) {
 			for (int j = 0; j < colunas; j++) {
 				prototiposAnterior[i][j] = prototipos[i][j];
